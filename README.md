@@ -4,12 +4,12 @@ This is a repository for playing around with syntactical definitions
 for Reedy Limits in univalent type theory, i.e. a type theory where
 all types are fibrant.
 
-Even for the weakest Reddy Limits we'll need a very sophisticated
-machinery, namely the coinductive counterpart of induction-recursion,
+Even for the weakest Reddy limits we'll need a very sophisticated
+machinery, namely the coinductive counterpart of induction-recursion:
 coinduction-recursion, a mutually dependent (however non-circular)
 definition of a coinductive type and a function signature of which
 depends on the type being defined. This is precisely the construction
-anticipated by Nikolai Kraus [1] and strongly related to so called
+anticipated by Nicolai Kraus [1] and strongly related to so called
 very dependent types by Jason Hickey [2]. Categorical semantics of
 such gadgets was not yet studied, but we hope that if we get syntax
 and computation rules to do the right thing, semantics can bent into
