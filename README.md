@@ -29,16 +29,12 @@ Now here's a code primer:
 	Simplex(n : Nat, succ(m)): (base : Simplex(n, m)) ×
      (filler(comb : Combs(n + 1, m + 2)) : Filler(face(comb)(base)))
 
-  @def face{n : Nat, m : Fin(n)}(comb : Combs(n, m))
-   {k : Fin(n + 1)}
-   (base : Simplex(n, k))
-   : Simplex(m, k \min (m + 1))
-    face(comb)(vertices : Simplex(n, 0)): vertices ∘ comb	 
-	face(comb)((base : Simplex(n, m)) ×
-     (filler(comb : Combs(n + 1, m + 2)) : Filler(face(comb)(base)))):
-      face(comb)(base) × (
-	    (comb' : Combs(n + 1, m + 2)): filler(comb ∘ comb')
-	  ) 
+  @def face{n : Nat, m : Fin(n), k : Fin(n + 1)}
+   (c : Combs(n, m))(s : Simplex(n, k)): Simplex(m, k ∧ (m + 1))
+    face(c)(vertices : Simplex(n, 0)): vertices ∘ c	 
+	face(c)((base : Simplex(n, m)) ×
+     (filler(c' : Combs(n + 1, m + 2)) : Filler(face(c')(base)))):
+      face(c)(base) × ((c' : Combs(n + 1, m + 2)): filler(c ∘ c')) 
 ```
 We coinductivly define a semisimplicial type `(x : SST)` to be an
 object having a `Type`-valued family of eliminators `Filler{dim}`.
