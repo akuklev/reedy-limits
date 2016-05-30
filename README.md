@@ -30,7 +30,7 @@ Now here's a code primer:
      (filler(comb : Combs(n + 1, m + 2)) : Filler(face(comb)(base)))
 
   @def face{n : Nat, m : Fin(n), k : Fin(n + 1)}
-   (c : Combs(n, m))(s : Simplex(n, k)): Simplex(m, k ∧ (m + 1))
+   (c : Combs(n, m))(s : Simplex(n, k)): Simplex(m, k ∧ m)
     face(c)(vertices : Simplex(n, 0)): vertices ∘ c	 
 	face(c)((base : Simplex(n, m)) ×
      (filler(c' : Combs(n + 1, m + 2)) : Filler(face(c')(base)))):
