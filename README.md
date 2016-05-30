@@ -34,14 +34,12 @@ Now here's a code primer:
    (base : Simplex(n, k))
    : Simplex(m, k \min (m + 1))
     face(comb)(vertices : Simplex(n, 0)): vertices ∘ comb	 
-	face(comb)((base : Simplex(n, m)) × filler(_)):
+	face(comb)((base : Simplex(n, m)) ×
+     (filler(comb : Combs(n + 1, m + 2)) : Filler(face(comb)(base)))):
       face(comb)(base) × (
 	    (comb' : Combs(n + 1, m + 2)): filler(comb ∘ comb')
 	  ) 
 ```
-
-Надо выбирать только те comb', к которых кодомен входит в кодомен comb.
-
 We coinductivly define a semisimplicial type `(x : SST)` to be an
 object having a `Type`-valued family of eliminators `Filler{dim}`.
 
