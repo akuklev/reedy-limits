@@ -9,10 +9,10 @@ we'll use the `@Structure` keyword for them:
   fst : A
   snd : B
 ```
-(We use brakets for proof-irrelevant, and curly braces for implicit
-yet possibly proof-relevant arguments. Fresh variable introduction
-has the syntax `name : type` whitespaces around colon are strictly
-mandatory, all fresh variables MUST be typed on the spot.)
+Declaration of an eliminator as well as fresh variable introduction
+have the syntax `name : type`. All fresh variables MUST be typed on
+the spot, since type declaration is the only way to introduce fresh
+identifier. Whitespaces around colon are strictly mandatory.
 
 Note that it's allowed for eliminator signatures to depend on other
 eliminator values, as long as the dependency is non-circular, e.g.
@@ -37,7 +37,20 @@ next ones, thus, well-founded corecursion enables very rich usage,
 Eliminating has the syntax `p.fst`, definitions make use of colon
 _without_ preceding whitespace.
 
+One of defining features of coinductive types is that the signature
+of eliminators might include the type that is being defined (but only
+strictly-positively), which enables definitions of infinitary
+structures while using only finite number of eliminators:
+```
+@Structure Stream[T : Type]:
+  head : T
+  tail : Stream[T]
+```
+
 ## Π-Types, Pattern Matching and λ-expressions
+Above we considered only coinductive types with finite number of
+eliminators, but there might be an infinite family of eliminators,
+which is facilitated by allowing eliminators to be parametrized. 
 Function types (X -> Y) and П-types in general are very simple
 examples of coinductive types, they just have a family of
 eliminators indexed by X and returning Y:
@@ -64,7 +77,7 @@ by pattern matching:
   succ(n : Nat): succ(n) · factorial(n)
 ```
 
-### Equiping objects with optional structure
+### Syntax Sugar: Equiping objects with optional structure
 One very often talks about a type or an object being equipped with
 an additional structure or property. To facilitate such casual usage
 of structures, one eliminator returning a manifestly non-record type
@@ -81,8 +94,73 @@ an expression won't typecheck otherwise, e.g.
   monotonicity(a b : X) : (a < b) -> (f(a) < f(b))
 ```
 
+### Syntax Sugar: Partial instantiation and existential paramerers
+Consider the type
+```
+@Structure Point:
+ x : Real
+ y : Real
+ z : Real
+```
+The syntax Point[x: 5] defines a type of points p with p.x = 5,
+this feature is called “partial instantiation”. We have already
+seen lots of structures parametrized by arguments in brackets
+like
+```
+@Structure Pair[A B : Type]:
+  fst : A
+  snd : B
+```
+This should be read as a syntactic sugar over
+```
+@Structure Pair':
+  A B : Type
+  fst : A
+  snd : B
+```
+that allows partial instantiation without writing down the names of
+filled fields:
+```
+Pair[Nat, Int] === Pair'[A: Nat, B: Int]
+```
+
+Using brakets for parameters instead of parentheses allows us writing
+generic functions in a more concise style like
+```
+@def reduce(p : List)(f : BinOp[p.T]): p.T
+```
+but forbids proof-relevant (aka runtime) usage of the parameter at
+the site of type definition, i.e. we cannot use brakets instead of
+parentheses in the following example
+```
+@Structure NumberGenerator(negativeNumbersAllowed : Bool):
+  nextNumber : negativeNumbersAllowed.elim
+    ff: Nat
+	tt: Int
+```
+Note that in the latter case there is no type NumberGenerator with
+parameter omited, there are only fixed types NumberGenerator(tt) and
+NumberGenerator(ff).
+
+Both kinds of parameters can be also used when defining inductive
+types:
+```
+@Family List[T : Type, len : Nat]:
+  nil{T : Type} : List[T, 0]
+  cons{T : Type}(head : T, tail: List[T]) : List[T, tail.len + 1]
+  
+@Family Fin(n : Nat): n.elim
+    zero: #empty
+	succ(n' : Nat):
+	  fzero
+	  fsucc(p : Fin(n))
+```
+
+(Braces work as parentheses except that arguments in braces are
+implicit or optional.)
+
 ## Very Dependent Types
-Now if we were to allow a function type to be defined simultaneously
+If we were to allow a function type to be defined simultaneously
 (allowing non-circular mutual dependence) with an inductive family of
 eliminators, we obtain the Very Dependent Types as defined by Jason
 Hickey, that's the coinductive counterpart of induction-recursion.
@@ -122,14 +200,6 @@ where Combs(n, m : Fin(n)) denotes the type of strictly monotone
 functions from Fin(m) to Fin(n).
 
 ### Open Recursion and Hereditary Substitution
-Primary usage of coinduction is the definition of infinitary data
-structures, such as
-```
-@Structure Stream[T : Type]:
-  head: T
-  tail: Stream[T]
-```
-
 The type Stream[Nat] cannot be exhausted by induction, but we still
 can define dependent types T(s : Stream[Nat]) which enable, by nature
 of the dependence, very recursive definitions for dependent functions
