@@ -39,7 +39,7 @@ interlace(\a \b : Stream[\T]) : Stream[T]
 ```
 
 ## Block syntax for dependent records (and more general coinductive types)
-We propose the keyword `@Structure` for block definition of dependent records for two reasons: 
+We propose the keyword `@Structure` for block definitions of dependent records for two reasons: 
 – simple records are known as structures in the C programming language and its numerous derivatives;
 – dependent records with type members encode spaces equipped with extra structure, examples being a monoid, a group, a topological space etc.
 
