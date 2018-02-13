@@ -74,7 +74,7 @@ We'll also allow to define structures with parameters:
   head : T
   tail : Stream[T]
 ```
-Use of square brackets for parameters suggest they can omited if their values can be inferred from the usage context. Usual parentheses should be used when optionality is not desired or possible due to non-uniform use of the parameter, e.g. one performs case analysis on its value:
+Use of square brackets for parameters suggest they can be omited if their values can be inferred from the usage context. Usual parentheses should be used when optionality is not desired or possible due to non-uniform use of the parameter, e.g. one performs case analysis on its value:
 ```
 @Structure NumberGenerator(negativeNumbersAllowed : Bool):
   nextNumber : negativeNumbersAllowed ▶ (tt ↦ Int; ff ↦ Nat)
