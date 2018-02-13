@@ -1,26 +1,69 @@
 # Coinduction-Corecursion
+## Basic inline syntax
+```
 
-## Coinductive types and basic syntax
-Coinductive types are defined by their eliminators, the most
-trivial coinductive types are (dependent) records, that's why
-we'll use the `@Structure` keyword for them:
-```
-@Structure Pair[A B : Type]:
-  fst : A
-  snd : B
-```
-Declaration of an eliminator as well as fresh variable introduction
-have the syntax `name : type`. All fresh variables MUST be typed on
-the spot, since type declaration is the only way to introduce fresh
-identifier. Whitespaces around colon are strictly mandatory.
+f(x)              # application
 
-Note that it's allowed for eliminator signatures to depend on other
-eliminator values, as long as the dependency is non-circular, e.g.
+(a, b)            # pair formation
+
+\x ↦ t(x)         # raw lambda expression
+
+(\x : T) ↦ t(x)   # annotated lambda expression
+
+(\x : A) ⟶ B(x)  # dependent function type
+
+(\x : A) × B(x)   # dependent pair type
+
+# Examples of inline pattern matching:
+(\n, \m) ↦ n + m
+
+(Zero ↦ ff; Succ(\n) ↦ tt)
+
+# Same type variables shorthand:
+(\x \y : T)   ≡   (\x : T, \y : T)
 ```
+Backslash is the mandatory freshness sigil used each time a new variable is introduced.
+
+## Block syntax for dependent records (and more general coinductive types)
+We propose the keyword `@Structure` for block definition of dependent records for two reasons: 
+– simple records are known as structures in the C programming language and its numerous derivatives;
+– dependent records with type members encode spaces equipped with extra structure, examples being a monoid, a group, a topological space etc.
+
+Examples:
+```
+@Structure CartesianPoint:
+  x : Real
+  y : Real
+
 @Structure PointedType:
   T : Type
   p : T
 ```
+
+The definition of such a type is a list of declarations of its methods having the syntax `name : type` (whitespaces around colon are mandatory). As seen in the second example, member signatures may depend on previously declared members. We'll also allow recursion generalizing dependent records to so called coinductive types. The signature
+of eliminators will be allowed include the type that is being defined (yet only
+strictly-positively), which enables definitions of infinitary
+structures while using only finite number of eliminators:
+```
+@Structure NatStream:
+  head : Nat
+  tail : NatStream
+```
+
+We'll also allow to define structures with parameters:
+```
+@Structure Pair[\A \B : Type]:
+  fst : A
+  snd : B
+  
+@Structure Pointed[\T : Type]:
+  p : T
+  
+@Structure Stream[\T : Type]:
+  head : T
+  tail : Stream[T]
+```
+Use of square brackets for parameters suggest they are optional. This is not only because in many cases they can be inferred, but also because the difference between parameters and methods is a fluid one: whenever one uses `Pointed` without `[T]`, it can be interpreted as `PointedType`: the concrete value of `T` is not settled at refrence point but remains open until it will be set explicitly or will be inferrable form the usage context.  
 
 Elements of coinductive types can be defined by means of
 corecursion, i.e. by providing for the object we define
@@ -36,16 +79,6 @@ next ones, thus, well-founded corecursion enables very rich usage,
 
 Eliminating has the syntax `p.fst`, definitions make use of colon
 _without_ preceding whitespace.
-
-One of defining features of coinductive types is that the signature
-of eliminators might include the type that is being defined (but only
-strictly-positively), which enables definitions of infinitary
-structures while using only finite number of eliminators:
-```
-@Structure Stream[T : Type]:
-  head : T
-  tail : Stream[T]
-```
 
 ## Π-Types, Pattern Matching and λ-expressions
 Above we considered only coinductive types with finite number of
@@ -66,8 +99,8 @@ We'll allow omiting eliminator name altogether for this case to obtain
 natural syntax for function types, lambda expressions and definitions
 by pattern matching:
 ```
-@Structure [X : Type]->[Y : Type]:
-  (x : X) : Y
+@Structure [\X : Type]->[\Y : Type]:
+  (\x : X) : Y
   
 @def square: Nat -> Nat
   (n : Nat): n · n
