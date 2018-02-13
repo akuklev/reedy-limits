@@ -29,7 +29,7 @@ Backslash is the mandatory freshness sigil used each time a new variable is intr
 
 Use of freshness sigils in particular allows to shorten signatures like
 ```
-interlace[\T : ∗](\a \b : Stream[T]) : Stream[T]
+interlace[\T : *](\a \b : Stream[T]) : Stream[T]
 # For an (automatically inferred if possible) type `T` and two `Stream[T]`s produces a `Stream[T]`
 ```
 to
@@ -50,7 +50,7 @@ Examples:
   y : Real
 
 @Structure PointedType:
-  T : ∗
+  T : *
   p : T
 ```
 
@@ -66,11 +66,11 @@ structures while using only finite number of eliminators:
 
 We'll also allow to define structures with parameters:
 ```
-@Structure Pair[\A \B : ∗]:
+@Structure Pair[\A \B : *]:
   fst : A
   snd : B
   
-@Structure Stream[\T : ∗]:
+@Structure Stream[\T : *]:
   head : T
   tail : Stream[T]
 ```
@@ -95,7 +95,7 @@ next ones, thus, well-founded corecursion enables very rich usage,
 Eliminating has the syntax `p.fst`, definitions make use of colon
 _without_ preceding whitespace.
 
-## Π-Types, Pattern Matching and λ-expressions
+## Function types, Pattern Matching and λ-expressions
 Above we considered only coinductive types with finite number of
 eliminators, but there might be an infinite family of eliminators,
 which is facilitated by allowing eliminators to be parametrized. 
@@ -103,10 +103,10 @@ Function types `(X ⟶ Y)` and П-types in general are very simple
 examples of coinductive types, they just have a family of
 eliminators indexed by `X` and returning `Y`:
 ```
-@Structure Func(\X \Y : ∗):
+@Structure Func(\X \Y : *):
   apply(\x : X) : Y
 
-@Structure DepFunc(\X : ∗, \Y : Func(X, ∗)):
+@Structure DepFunc(\X : *, \Y : Func(X, *)):
   apply(\x : X) : Y.apply(x)
 ```
 
@@ -116,7 +116,7 @@ by pattern matching:
 ```
 @Structure @infix (\X : Type)⟶(\Y : Type):
   (\x : X) : Y
-  
+
 @def square: Nat ⟶ Nat
   (\n : Nat): n · n
   
@@ -125,7 +125,7 @@ by pattern matching:
   Succ(\n : Nat): Succ(n) · factorial(n)
 ```
 
-## Indexed Coinductive Types Include VDTs (Jason Hickey’s "Very Dependent Types")
+## Indexed Coinductive Types Include Jason Hickey’s "Very Dependent Types"
 
 The canonical example of a very dependent type is the infinite generalization of the dependent pair — the stream of the form `(a : A, b : B(a), c : C(b), ...)`. Indexed (dependent) coinductive types facilitate definitions of both a type signature of such a stream and of a stream for a given signature. Recall that the constructor Sigma of the dependent pair type requires an closure of the form `(\a : FirstType) ↦ SecondType`. The constructor for the TypeTower will be a "closure" of the form `(\v : HeadType) ↦ NextType, "tail"`. What’s the type of the "tail"? It should be a box, containing the "closure" of the same form for the NextType in the role of the HeadType. Let’s write it down:
 ```
